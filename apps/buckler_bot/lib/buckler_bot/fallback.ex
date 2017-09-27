@@ -1,7 +1,7 @@
 defmodule BucklerBot.Fallback do
   require Logger
 
-  def handle_fallback(conn = %{fallback: %{
+  def handle_fallback(%{fallback: %{
     "ok" => true,
     "result" => %{
       "chat" => %{

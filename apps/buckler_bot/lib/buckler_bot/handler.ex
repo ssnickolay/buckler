@@ -29,7 +29,7 @@ defmodule BucklerBot.Handler do
   end
 
   def handle(conn = %Agala.Conn{
-    request_bot_params: %Agala.BotParams{name: name},
+    request_bot_params: %Agala.BotParams{name: _name},
     request: %{
       "message" => %{
         "message_id" => message_id,
@@ -38,7 +38,7 @@ defmodule BucklerBot.Handler do
         },
         "new_chat_member" => %{
           "first_name" => first_name,
-          "id" => user_id
+          "id" => _user_id
         }
       }
     }
@@ -66,7 +66,7 @@ defmodule BucklerBot.Handler do
   end
 
   def handle(conn = %Agala.Conn{
-    request_bot_params: %Agala.BotParams{name: name},
+    request_bot_params: %Agala.BotParams{name: _name},
     request: %{
       "message" => %{
         "text" => text,
@@ -100,7 +100,7 @@ defmodule BucklerBot.Handler do
   end
 
   def handle(conn = %Agala.Conn{
-    request_bot_params: %Agala.BotParams{name: name},
+    request_bot_params: %Agala.BotParams{name: _name},
     request: %{
       "message" => %{
         "message_id" => message_id,
