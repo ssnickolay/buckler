@@ -61,4 +61,37 @@ defmodule BucklerBot.HandlerTest do
       assert {false, :authorized} = Repo.user_unauthorized?(205798533, 1)
     end
   end
+
+  describe "when user join to chat" do
+    setup do
+      [conn: %Agala.Conn{
+        request_bot_params: %Agala.BotParams{name: "Some name"},
+        request: %{
+          "message" => %{
+            "message_id" => 1703,
+            "chat" => %{
+              "id" => 205798533
+            },
+            "new_chat_member" => %{
+              "first_name" => "Tilon",
+              "id" => 1
+            }
+          }
+        }
+      }]
+    end
+
+    test "should return welcome response", %{conn: conn} do
+      conn = Handler.handle(conn, [])
+      %Response{payload: %{body: body}} = conn.response
+
+      assert body.parse_mode == "Markdown"
+      assert body.text =~ "Hello, *Tilon*!\n\nPlease, calculate:\n*"
+
+      {true, user} = Repo.user_unauthorized?(205798533, 1)
+      assert user.user_id == 1
+      assert user.name == "Tilon"
+      assert user.chat_id == 205798533
+    end
+  end
 end
