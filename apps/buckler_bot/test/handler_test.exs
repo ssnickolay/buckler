@@ -19,7 +19,7 @@ defmodule BucklerBot.HandlerTest do
 
   describe "when unauthorized user left the chat" do
     setup do
-      insert_user(%User{chat_id: 205798533, user_id: 1})
+      insert_user(%User{chat_id: 205798533, user_id: 1, message_to_delete: 666})
       [conn: %Agala.Conn{
         request: %{
           "message" => %{
@@ -30,12 +30,12 @@ defmodule BucklerBot.HandlerTest do
       }]
     end
 
-    test "should successfully delete user from DB", %{conn: conn} do
+    test "should successfully delete user from DB and delete his message", %{conn: conn} do
       conn = Handler.handle(conn, [])
       assert %Response{
         method: :post,
         opts: [],
-        payload: %{body: %{chat_id: 205798533, message_id: nil}}
+        payload: %{body: %{chat_id: 205798533, message_id: 666}}
       } = conn.response
 
       assert {false, :authorized} = Repo.user_unauthorized?(205798533, 1)
@@ -92,6 +92,50 @@ defmodule BucklerBot.HandlerTest do
       assert user.user_id == 1
       assert user.name == "Tilon"
       assert user.chat_id == 205798533
+    end
+  end
+
+  describe "when user try to get answer" do
+    setup do
+      [conn: %Agala.Conn{
+        request_bot_params: %Agala.BotParams{name: "Some name"},
+        request: %{
+          "message" => %{
+            "text" => 140,
+            "message_id" => 555,
+            "chat" => %{
+              "id" => 205798533
+            },
+            "from" => %{
+              "id" => 1
+            }
+          }
+        }
+      }]
+    end
+
+    test "when unknown or already authorized user should return halt conn", %{conn: conn} do
+      conn = Handler.handle(conn, [])
+      assert is_nil(conn.response) == true
+    end
+
+    test "when user unauthorized and incorrect answer should delete all messages and kick from the chat", %{conn: conn} do
+      insert_user(%User{chat_id: 205798533, user_id: 1, answer: 141, message_to_delete: 666})
+
+      conn = Handler.handle(conn, [])
+      assert [%{
+        response: %Response{payload:
+          %{body: %{chat_id: 205798533, user_id: 1}} # kick user
+        }
+      }, %{
+        response: %Response{payload:
+          %{body: %{chat_id: 205798533, message_id: 555}}
+        }
+      }, %{
+        response: %Response{payload:
+          %{body: %{chat_id: 205798533, message_id: 666}}
+        }
+      }] = conn.multi.conns
     end
   end
 end
