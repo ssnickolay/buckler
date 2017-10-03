@@ -65,7 +65,6 @@ defmodule BucklerBot.HandlerTest do
   describe "when user join to chat" do
     setup do
       [conn: %Agala.Conn{
-        request_bot_params: %Agala.BotParams{name: "Some name"},
         request: %{
           "message" => %{
             "message_id" => 1703,
@@ -98,7 +97,6 @@ defmodule BucklerBot.HandlerTest do
   describe "when user try to get answer" do
     setup do
       [conn: %Agala.Conn{
-        request_bot_params: %Agala.BotParams{name: "Some name"},
         request: %{
           "message" => %{
             "text" => 140,
