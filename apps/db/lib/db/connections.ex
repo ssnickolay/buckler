@@ -25,6 +25,7 @@ defmodule DB.Connections do
     |> Repo.insert
   end
 
+  # TODO: move to private
   def create_chatuser(chat, user_id, name, answer, connected_message_id) do
     chat
     |> Ecto.build_assoc(:customers, %{
